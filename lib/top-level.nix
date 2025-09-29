@@ -7,9 +7,6 @@
 }:
 
 let
-  inherit (inputs) nixpkgs;
-  inherit (builtins) map;
-
   lib' = {
     global.toUppercase =
       str:
