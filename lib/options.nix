@@ -1,0 +1,47 @@
+{ lib, lib' }:
+
+let
+  inherit (lib) types;
+
+  types' = lib'.types;
+in
+
+rec {
+  mkOption = type: default: lib.mkOption { inherit type default; };
+  mkDefault = default: option: mkOption option.type default;
+
+  # Option modifiers
+  mkReadOnly =
+    option:
+    lib.mkOption {
+      inherit (option) type default;
+      readOnly = true;
+    };
+  mkAttrsOf = option: mkOption (types.attrsOf option.type) { };
+  mkSingleAttrOf = option: mkOption (types'.singleAttrOf option.type) { };
+  mkNullOr = option: mkOption (types.nullOr option.type) null;
+  mkListOf = option: mkOption (types.listOf option.type) [ ];
+  mkEither = option1: option2: mkOption (types.either option1.type option2.type) option1.default;
+  mkOneOf =
+    options:
+    mkOption (types.oneOf (builtins.map (option: option.type) options))
+      (builtins.elemAt options 0).default;
+  mkFunctionTo = option: mkOption (types.functionTo option.type) (_: option.default);
+
+  # Default options
+  mkTrueOption = mkOption types.bool true;
+  mkFalseOption = mkOption types.bool false;
+  mkStrOption = mkOption types.str "";
+  mkIntOption = mkOption types.int 0;
+  mkPortOption = mkOption types.port 0;
+  mkEnumOption = enum: mkOption (types.enum enum) (builtins.elemAt enum 0);
+  mkSubmoduleOption =
+    # The function is expected to be something like `{ config, ... }: { ... }`
+    optionsOrFunction:
+    if builtins.isFunction optionsOrFunction then
+      mkOption (types.submodule optionsOrFunction) { }
+    else
+      mkOption (types.submodule { options = optionsOrFunction; }) { };
+  mkPathOption = mkOption types.path "/";
+  mkAttrsOption = mkOption types.attrs { };
+}
