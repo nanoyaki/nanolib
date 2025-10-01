@@ -40,6 +40,7 @@ rec {
 
       modules = [
         { nixpkgs.overlays = [ self.overlays.nanolib ]; }
+        nanomodules.nixosModules.all
         (nanomodules.nixosModules.nanoSystem {
           inherit
             hostname
