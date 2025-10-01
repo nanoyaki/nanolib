@@ -1,4 +1,7 @@
-{ lib, ... }:
+# SPDX-FileCopyrightText: 2025 Hana Kretzer <hanakretzer@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+{ lib }:
 
 let
   inherit (lib) types;

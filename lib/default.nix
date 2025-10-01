@@ -1,11 +1,11 @@
+# SPDX-FileCopyrightText: 2025 Hana Kretzer <hanakretzer@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 {
-  self,
-  inputs,
   lib,
-  withSystem,
   ...
-}@flakePartsArgs:
+}:
 
 {
-  flake.lib = import ./top-level.nix flakePartsArgs;
+  flake.lib = import ./top-level.nix { inherit lib; };
 }

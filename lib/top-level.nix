@@ -1,9 +1,8 @@
+# SPDX-FileCopyrightText: 2025 Hana Kretzer <hanakretzer@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 {
-  self,
-  inputs,
   lib,
-  withSystem,
-  ...
 }:
 
 let
@@ -14,8 +13,8 @@ let
       + builtins.substring 1 (builtins.stringLength str) str;
 
     options = import ./options.nix { inherit lib lib'; };
-    types = import ./types.nix { inherit lib lib'; };
-    systems = import ./systems.nix { inherit self inputs withSystem; };
+    types = import ./types.nix { inherit lib; };
+    systems = import ./systems.nix { inherit lib; };
   };
 in
 

@@ -1,51 +1,56 @@
+# SPDX-FileCopyrightText: 2025 Hana Kretzer <hanakretzer@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 {
-  self,
-  inputs,
-  withSystem,
+  lib,
 }:
-
-let
-  inherit (inputs) nanomodules nixpkgs;
-in
 
 rec {
   _mkSystem =
     type:
 
     {
+      inputs,
       hostname,
       users,
       platform ? "x86_64-linux",
       config,
     }:
 
-    (withSystem platform (
-      { inputs', self', ... }:
+    let
+      ensureInput = input: lib.throwIf (!(inputs ? input)) "Input ${input} is missing" inputs.${input};
 
-      nixpkgs.lib.nixosSystem {
-        specialArgs = {
+      nixpkgs = ensureInput "nanomodules";
+      nanomodules = ensureInput "nanomodules";
+    in
+
+    nixpkgs.lib.nixosSystem {
+      specialArgs = {
+        inherit (inputs) self;
+        inherit inputs;
+
+        inputs' = lib.mapAttrs (
+          _: input:
+          lib.mapAttrs (
+            _: flakeOutput: if flakeOutput ? ${platform} then flakeOutput.${platform} else flakeOutput
+          ) input
+        ) inputs;
+        self' = inputs'.self;
+      };
+
+      modules = [
+        { nixpkgs.overlays = [ self.overlays.nanolib ]; }
+        (nanomodules.nixosModules.nanoSystem {
           inherit
-            inputs'
-            inputs
-            self'
-            self
+            hostname
+            users
+            platform
+            type
             ;
-        };
-
-        modules = [
-          { nixpkgs.overlays = [ self.overlays.nanolib ]; }
-          (nanomodules.nixosModules.nanoSystem {
-            inherit
-              hostname
-              users
-              platform
-              type
-              ;
-          })
-          config
-        ];
-      }
-    ));
+        })
+        config
+      ];
+    };
 
   # No UI and deployment options
   mkServer = _mkSystem "server";

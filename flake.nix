@@ -17,7 +17,7 @@
     inputs@{ flake-parts, systems, ... }:
 
     flake-parts.lib.mkFlake { inherit inputs; } (
-      { self, withSystem, ... }:
+      { self, ... }:
 
       {
         imports = [
@@ -29,11 +29,8 @@
           nanolib = (
             final: prev: {
               lib = prev.lib.extend (
-                _: _lib: {
-                  nanolib = import ./lib/top-level.nix {
-                    lib = _lib;
-                    inherit inputs withSystem self;
-                  };
+                _: lib: {
+                  nanolib = import ./lib/top-level.nix { inherit lib; };
                 }
               );
             }
