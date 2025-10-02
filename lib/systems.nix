@@ -19,7 +19,7 @@ rec {
     }:
 
     let
-      ensureInput = input: lib.throwIf (!(inputs ? input)) "Input ${input} is missing" inputs.${input};
+      ensureInput = input: lib.throwIf (!(inputs ? ${input})) "Input ${input} is missing" inputs.${input};
 
       nixpkgs = ensureInput "nixpkgs";
       nanomodules = ensureInput "nanomodules";
