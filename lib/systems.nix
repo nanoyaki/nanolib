@@ -43,14 +43,22 @@ rec {
       modules = [
         { nixpkgs.overlays = [ self.overlays.nanolib ]; }
         nanomodules.nixosModules.all
-        (nanomodules.nixosModules.nanoSystem {
-          inherit
-            hostname
-            users
-            platform
-            type
-            ;
-        })
+        (
+          # i hate this lmao but i ain't looking up
+          # how to do this correctly lololol
+          (
+            with builtins;
+            elemAt (elemAt (elemAt nanomodules.nixosModules.nanoSystem.imports 0).imports 0).imports 0
+          )
+            {
+              inherit
+                hostname
+                users
+                platform
+                type
+                ;
+            }
+        )
         config
       ];
     };
