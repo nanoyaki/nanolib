@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 {
   lib,
+  self,
 }:
 
 rec {
@@ -20,21 +21,22 @@ rec {
     let
       ensureInput = input: lib.throwIf (!(inputs ? input)) "Input ${input} is missing" inputs.${input};
 
-      nixpkgs = ensureInput "nanomodules";
+      nixpkgs = ensureInput "nixpkgs";
       nanomodules = ensureInput "nanomodules";
+
+      inputs' = lib.mapAttrs (
+        _: input:
+        lib.mapAttrs (
+          _: flakeOutput: if flakeOutput ? ${platform} then flakeOutput.${platform} else flakeOutput
+        ) input
+      ) inputs;
     in
 
     nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit (inputs) self;
-        inherit inputs;
+        inherit inputs inputs';
 
-        inputs' = lib.mapAttrs (
-          _: input:
-          lib.mapAttrs (
-            _: flakeOutput: if flakeOutput ? ${platform} then flakeOutput.${platform} else flakeOutput
-          ) input
-        ) inputs;
         self' = inputs'.self;
       };
 

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 {
   lib,
+  self,
 }:
 
 let
@@ -14,7 +15,7 @@ let
 
     options = import ./options.nix { inherit lib lib'; };
     types = import ./types.nix { inherit lib; };
-    systems = import ./systems.nix { inherit lib; };
+    systems = import ./systems.nix { inherit lib self; };
   };
 in
 
