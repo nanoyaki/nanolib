@@ -30,7 +30,7 @@
             final: prev: {
               lib = prev.lib.extend (
                 _: lib: {
-                  nanolib = import ./lib/top-level.nix { inherit lib; };
+                  nanolib = import ./lib/top-level.nix { inherit lib self; };
                 }
               );
             }
