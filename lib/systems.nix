@@ -31,9 +31,13 @@ rec {
           _: flakeOutput: if flakeOutput ? ${platform} then flakeOutput.${platform} else flakeOutput
         ) input
       ) inputs;
+
+      extendedLib = nixpkgs.lib.extend (
+        _: lib: { nanolib = import ./top-level.nix { inherit lib self; }; }
+      );
     in
 
-    nixpkgs.lib.nixosSystem {
+    extendedLib.nixosSystem {
       specialArgs = {
         inherit (inputs) self;
         inherit inputs inputs' lib';
