@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 {
   lib,
+  lib',
   self,
 }:
 
@@ -35,7 +36,7 @@ rec {
     nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit (inputs) self;
-        inherit inputs inputs';
+        inherit inputs inputs' lib';
 
         self' = inputs'.self;
       };

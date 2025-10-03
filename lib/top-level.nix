@@ -15,7 +15,7 @@ let
 
     options = import ./options.nix { inherit lib lib'; };
     types = import ./types.nix { inherit lib; };
-    systems = import ./systems.nix { inherit lib self; };
+    systems = import ./systems.nix { inherit lib lib' self; };
   };
 in
 
