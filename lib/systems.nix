@@ -35,37 +35,41 @@ rec {
       extendedLib = nixpkgs.lib.extend (
         _: lib: { nanolib = import ./top-level.nix { inherit lib self; }; }
       );
+
+      prev = extendedLib.nixosSystem {
+        specialArgs = {
+          inherit (inputs) self;
+          inherit inputs inputs' lib';
+
+          self' = inputs'.self;
+        };
+
+        modules = [
+          { nixpkgs.overlays = [ self.overlays.nanolib ]; }
+          nanomodules.nixosModules.all
+          (
+            # i hate this lmao but i ain't looking up
+            # how to do this correctly lololol
+            (
+              with builtins;
+              elemAt (elemAt (elemAt nanomodules.nixosModules.nanoSystem.imports 0).imports 0).imports 0
+            )
+              {
+                inherit
+                  hostname
+                  users
+                  platform
+                  type
+                  ;
+              }
+          )
+        ];
+      };
     in
 
-    extendedLib.nixosSystem {
-      specialArgs = {
-        inherit (inputs) self;
-        inherit inputs inputs' lib';
-
-        self' = inputs'.self;
-      };
-
-      modules = [
-        { nixpkgs.overlays = [ self.overlays.nanolib ]; }
-        nanomodules.nixosModules.all
-        (
-          # i hate this lmao but i ain't looking up
-          # how to do this correctly lololol
-          (
-            with builtins;
-            elemAt (elemAt (elemAt nanomodules.nixosModules.nanoSystem.imports 0).imports 0).imports 0
-          )
-            {
-              inherit
-                hostname
-                users
-                platform
-                type
-                ;
-            }
-        )
-        config
-      ];
+    prev.extendModules {
+      modules = [ config ];
+      specialArgs = { inherit prev; };
     };
 
   # No UI and deployment options
